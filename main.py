@@ -1,6 +1,6 @@
-from gui import run_gui
+from Ordinaria2023.gui import run_gui
 from flask import Flask, jsonify
-from pokemon import PokemonBattleSimulator
+from Ordinaria2023.pokemon import PokemonBattleSimulator
 
 app = Flask(__name__)
 
