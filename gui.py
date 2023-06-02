@@ -31,6 +31,3 @@ def add_transaction():
 def run_gui():
     gui = GUI()
     gui.show_gui()
-
-if __name__ == '__main__':
-    app.run(debug=True, threaded=True)
