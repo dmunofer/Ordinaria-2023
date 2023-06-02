@@ -1,53 +1,56 @@
+import time
+import queue
 import threading
 from multiprocessing import Pool
-import time
+from blaze import Blockchain
 
 class Pokemon:
-    def __init__(self, name):
+    def __init__(self, name, opponent, blockchain):
         self.name = name
-        self.attacks = []
-        self.opponent = None
-
-    def add_attack(self, attack):
-        self.attacks.append(attack)
-
-    def set_opponent(self, opponent):
         self.opponent = opponent
+        self.attack_queue = queue.Queue()
+        self.blockchain = blockchain
 
-    def perform_attack(self, attack):
-        print(f"{self.name} realiza {attack} en {self.opponent.name}")
-        time.sleep(1)
+    def generate_attack(self):
+        while True:
+            attack = f"Attack from {self.name} - {time.strftime('%H:%M:%S')}"
+            self.attack_queue.put(attack)
+            self.blockchain.add_transaction(self.name, attack)
+            time.sleep(1)
 
-def pokemon_thread(pokemon):
-    while True:
-        if pokemon.opponent:
-            if pokemon.attacks:
-                attack = pokemon.attacks.pop(0)
-                pokemon.perform_attack(attack)
-            else:
-                print(f"{pokemon.name} no tiene ataques disponibles.")
-        time.sleep(1)
+    def consume_attack(self):
+        while True:
+            if not self.attack_queue.empty():
+                attack = self.attack_queue.get()
+                print(f"{self.name} received attack: {attack}")
+                time.sleep(1)
 
-def battle_simulation():
-    # Crear los Pokémon
-    pikachu = Pokemon("Pikachu")
-    charizard = Pokemon("Charizard")
+    def start_battle(self):
+        pool = Pool(processes=2)
+        pool.apply_async(self.generate_attack)
+        pool.apply_async(self.consume_attack)
+        pool.close()
+        pool.join()
 
-    # Configurar los ataques de los Pokémon
-    pikachu.add_attack("Impactrueno")
-    charizard.add_attack("Lanzallamas")
+class PokemonBattleSimulator:
+    def __init__(self):
+        self.blockchain = Blockchain()
+        self.pokemon1 = Pokemon("Charizard", "Blastoise", self.blockchain)
+        self.pokemon2 = Pokemon("Blastoise", "Charizard", self.blockchain)
 
-    # Establecer los oponentes de los Pokémon
-    pikachu.set_opponent(charizard)
-    charizard.set_opponent(pikachu)
+    def start_simulation(self):
+        thread1 = threading.Thread(target=self.pokemon1.start_battle)
+        thread2 = threading.Thread(target=self.pokemon2.start_battle)
 
-    # Crear el pool de procesos para los hilos
-    pool = Pool(processes=2)
+        thread1.start()
+        thread2.start()
 
-    # Ejecutar los hilos de los Pokémon en el pool
-    pool.apply_async(pokemon_thread, args=(pikachu,))
-    pool.apply_async(pokemon_thread, args=(charizard,))
+        thread1.join()
+        thread2.join()
 
-    # Cerrar el pool y esperar a que todos los hilos terminen
-    pool.close()
-    pool.join()
+def main():
+    simulator = PokemonBattleSimulator()
+    simulator.start_simulation()
+
+if __name__ == '__main__':
+    main()
