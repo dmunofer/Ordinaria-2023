@@ -6,8 +6,8 @@ app = Flask(__name__)
 
 @app.route('/add_transaction', methods=['POST'])
 def add_transaction():
-    # Implement the logic to add a transaction to the blockchain
-    # You can access the simulator and the blockchain objects here
+    # Implementar la lógica para agregar una transacción a la blockchain
+    # Puedes acceder a los objetos simulator y blockchain aquí
 
     return jsonify({"message": "Transaction added successfully"})
 
