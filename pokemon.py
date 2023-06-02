@@ -48,9 +48,3 @@ class PokemonBattleSimulator:
         thread1.join()
         thread2.join()
 
-def main():
-    simulator = PokemonBattleSimulator()
-    simulator.start_simulation()
-
-if __name__ == '__main__':
-    main()
