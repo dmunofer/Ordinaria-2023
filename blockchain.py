@@ -38,13 +38,3 @@ def get_blockchain():
     # Devolver la blockchain como respuesta
     return jsonify(transactions)
 
-if __name__ == '__main__':
-    # Crear el pool de procesos para la aplicación Flask
-    pool = Pool(processes=1)
-
-    # Ejecutar la aplicación Flask en un proceso del pool
-    pool.apply_async(app.run)
-
-    # Cerrar el pool y esperar a que la aplicación termine
-    pool.close()
-    pool.join()
